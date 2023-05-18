@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Col,
-  Form,
-  Button,
-  Card,
-  Row
-} from 'react-bootstrap';
+import { useMutation } from '@apollo/client';
+import { SAVE_BOOK } from '../utils/mutations';
+import { Container, Col, Form, Button, Card, Row, Jumbotron } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
 import { saveBook, searchGoogleBooks } from '../utils/API';
@@ -72,9 +67,11 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
+      const { data } = await saveBook({
+        variables: { input: bookInput },
+      });
 
-      if (!response.ok) {
+      if (error) {
         throw new Error('something went wrong!');
       }
 
@@ -87,7 +84,7 @@ const SearchBooks = () => {
 
   return (
     <>
-      <div className='text-light bg-dark pt-5'>
+      <Jumbotron fluid className='text-light bg-dark pt-5'>
         <Container>
           <h1>Search for Books!</h1>
           <Form onSubmit={handleFormSubmit}>
@@ -110,7 +107,7 @@ const SearchBooks = () => {
             </Row>
           </Form>
         </Container>
-      </div>
+      </Jumbotron>
 
       <Container>
         <h2 className='pt-5'>
@@ -122,7 +119,7 @@ const SearchBooks = () => {
           {searchedBooks.map((book) => {
             return (
               <Col md="4">
-                <Card key={book.bookId} border='dark'>
+                <Card border='dark' className='mb-3'>
                   {book.image ? (
                     <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' />
                   ) : null}
